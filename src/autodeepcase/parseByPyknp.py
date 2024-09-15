@@ -8,7 +8,7 @@ from utiles import make_two_dimensional_array, make_hierarchy, bunsetsuParser
 # 総裁になれば所属する麻生派を離脱する考えも示し、長老や派閥が閣僚・党役員の人事に影響を及ぼす旧来型の自民党政治からの脱却を誓った。")
 # parsed_result = knp.parse(
 #     "日本を旅行中の外国人に戸惑いが広がっている。")
-text = '台風5号は、10日(土)午後3時には日本の東にあって、1時間におよそ20キロの速さで北へ進んでいる。'
+text = '南海トラフ地震の臨時情報（巨大地震注意）発表を受け、日本を旅行中の外国人に戸惑いが広がっている。'
 
 print("----------文節----------")
 parsed_text = bunsetsuParser.parse_text2bunsetsu(text)  # 文節ごとにリストで返される
@@ -31,6 +31,11 @@ for bnst in parsed_text:
         match_kaisekikaku = re.search(pattern_kaisekikaku, tag.fstring)
         pattern_kakari = r'<係:([ァ-ヶー]+)格>'
         match_kakari = re.search(pattern_kakari, tag.fstring)
+        pattern_joshi_1 = r'<([ァ-ヶー]+)><助詞>'
+        match_joshi_1 = re.search(pattern_joshi_1, tag.fstring)
+        # pattern_joshi_2 = r'<([^<>]+)><助詞>'
+        pattern_joshi_2 = r'([ァ-ヶー]+)[^ァ-ン]*<助詞>'
+        match_joshi_2 = re.search(pattern_joshi_2, tag.fstring)
         pattern_judoutai = r'<態:受動>'
         match_judoutai = re.search(pattern_judoutai, tag.fstring)
         if match_kaisekikaku:
@@ -39,6 +44,12 @@ for bnst in parsed_text:
         elif match_kakari:
             tag_record = {'id': tag.tag_id, 'midasi': "".join(
                 mrph.midasi for mrph in tag.mrph_list()), '係り受けタイプ': tag.dpndtype, 'parent_id': tag.parent_id, 'surface_case': match_kakari.group(1), 'fstring': tag.fstring}
+        elif match_joshi_1:
+            tag_record = {'id': tag.tag_id, 'midasi': "".join(
+                mrph.midasi for mrph in tag.mrph_list()), '係り受けタイプ': tag.dpndtype, 'parent_id': tag.parent_id, 'surface_case': match_joshi_1.group(1), 'fstring': tag.fstring}
+        elif match_joshi_2:
+            tag_record = {'id': tag.tag_id, 'midasi': "".join(
+                mrph.midasi for mrph in tag.mrph_list()), '係り受けタイプ': tag.dpndtype, 'parent_id': tag.parent_id, 'surface_case': match_joshi_2.group(1), 'fstring': tag.fstring}
         elif match_judoutai:
             tag_record = {'id': tag.tag_id, 'midasi': "".join(
                 mrph.midasi for mrph in tag.mrph_list()), '係り受けタイプ': tag.dpndtype, 'parent_id': tag.parent_id, 'surface_case': '受動態', 'fstring': tag.fstring}
@@ -53,8 +64,11 @@ for bnst in parsed_text:
         pattern_kakukaiseki = r'<格解析結果:'
         match_kakukaiseki = re.search(
             pattern_kakukaiseki, tag_record['fstring'])
+        pattern_doutaijutsugo = r'<動態述語>'
+        match_doutaijutsugo = re.search(
+            pattern_doutaijutsugo, tag_record['fstring'])
 
-        if match_kakukaiseki:
+        if match_kakukaiseki and match_doutaijutsugo:
             tag_record_after = {
                 'id': tag_record['id'], 'midasi': tag_record['midasi'], 'surface_case': tag_record['surface_case'], 'parent_id': -1, 'is_verb': 'verb'}
             tag_list.append(tag_record_after)

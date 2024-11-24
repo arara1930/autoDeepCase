@@ -9,6 +9,7 @@ dependencies = [
     "pyknp>=0.6.1",
     "setuptools>=72.2.0",
     "numpy>=2.0.1",
+    "tqdm>=4.67.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"

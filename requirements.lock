@@ -17,3 +17,5 @@ setuptools==72.2.0
     # via autodeepcase
 six==1.16.0
     # via pyknp
+tqdm==4.67.0
+    # via autodeepcase

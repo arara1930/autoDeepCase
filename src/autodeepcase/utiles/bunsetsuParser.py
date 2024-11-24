@@ -5,9 +5,6 @@ from utiles import make_two_dimensional_array, make_hierarchy
 
 def parse_text2bunsetsu(text):
     knp = KNP()     # Default is JUMAN++. If you use JUMAN, use KNP(jumanpp=False)
-    # result = knp.parse("台風5号は、10日(土)午後3時には日本の東にあって、1時間におよそ20キロの速さで北へ進んでいる。南海トラフ地震の臨時情報（巨大地震注意）発表を受け、日本を旅行中の外国人に戸惑いが広がっている。総裁になれば所属する麻生派を離脱する考えも示し、長老や派閥が閣僚・党役員の人事に影響を及ぼす旧来型の自民党政治からの脱却を誓った。")
-    # parsed_result = knp.parse(
-    #     "南海トラフ地震の臨時情報（巨大地震注意）発表を受け、日本を旅行中の外国人に戸惑いが広がっている。")
 
     parsed_result = knp.parse(text)
 
@@ -29,11 +26,13 @@ def parse_text2bunsetsu(text):
 
     # print(pre_bnst_list)
 
-    # 親の親のIDが-1の時かつ(係り受けタイプがPまたは素性に<用言:動>がある)場合、親IDを強制的に-1にする
+    # 親の親のIDが-1の時かつ(素性に'<並キ:述'がある、かつ、素性に<用言:動>がある)場合、親IDを強制的に-1にする
     for bnst in pre_bnst_list:
         pattern_yougen = r'<用言:動>'
         match_yougen = re.search(pattern_yougen, bnst['fstring'])
-        if bnst['parent_id'] in parent_id_is_root_list and (bnst['kakariuketype'] == 'P' or match_yougen):
+        pattern_heiretsu = r'<並キ:述'
+        match_heiretsu = re.search(pattern_heiretsu, bnst['fstring'])
+        if bnst['parent_id'] in parent_id_is_root_list and (match_yougen and match_heiretsu):
             bnst_record = {'id': bnst['id'], 'midasi': bnst['midasi'],
                            'kakariuketype': bnst['kakariuketype'], 'parent_id': -1}
         else:

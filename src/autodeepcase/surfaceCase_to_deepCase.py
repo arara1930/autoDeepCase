@@ -34,13 +34,15 @@ input_text = '子供が<ga>学校から<kara>帰る<述語動詞>'
 
 def surfaceCase_to_deepCase(surface_dict_list):
     deepCased_predicate_clauses_list = []
+    # print('surface_dict_list:', surface_dict_list)
+    # print('\n')
     for predicate_clause in surface_dict_list:
         # print(predicate_clause)
 
         # 深層格付与
         deepCased_predicate_clauses_list.append(
             add_surfaceOrDeep_case.add_deepCase(predicate_clause))
-        # print(predicate_clauses_list)
+        # print(deepCased_predicate_clauses_list)
 
     # deepCased_sentences_dict = []
     # # 読み込んだデータを表示
@@ -72,7 +74,8 @@ def surfaceCase_to_deepCase(surface_dict_list):
 
 
 # "deep_case"が空白文字またはnoneの場合後ろの要素と結合させる
-def delete_empty_deep_case(record):
+# nliの形式に対応できるよう、sentence_1とsentence_2の両方に対して処理を行う
+def delete_empty_deep_case_for_nli(record):
     # 指定されたレコードに対して処理を実行
     for key in ["sentence_1", "sentence_2"]:  # 両方のキーに対して処理
         for sentence in record[key]:
@@ -116,6 +119,52 @@ def delete_empty_deep_case(record):
                     break
 
     return record
+
+# "deep_case"が空白文字またはnoneの場合後ろの要素と結合させる
+
+
+def delete_empty_deep_case(sentence):
+    # 指定されたレコードに対して処理を実行
+    while True:  # "deep_case" がなくなるまで繰り返す
+        merged_sentence = []  # 結果を格納するリスト
+        skip_next = False  # 次の要素をスキップするフラグ
+        has_empty_deep_case = False  # "deep_case": "" が存在するかを判定
+
+        for i in range(len(sentence)):
+            if skip_next:
+                skip_next = False
+                continue
+
+            current = sentence[i]
+
+            # "deep_case" が空であれば次の要素と結合
+            if current["deep_case"] == "" or current["deep_case"] == "none":
+                has_empty_deep_case = True  # 空の "deep_case" があったことを記録
+
+                # 次の要素が存在する場合
+                if i + 1 < len(sentence):
+                    next_item = sentence[i + 1]
+                    # "text" を結合
+                    current["text"] += next_item["text"]
+                    # "symple_phrase" を False に設定
+                    current["symple_phrase"] = False
+                    # "surface_case" と "deep_case" を次の要素から引き継ぎ
+                    current["surface_case"] = next_item["surface_case"]
+                    current["deep_case"] = next_item["deep_case"]
+                    # 次の要素をスキップ
+                    skip_next = True
+
+            # 結合済みまたはそのままの要素を結果に追加
+            merged_sentence.append(current)
+
+        # sentence の更新
+        sentence[:] = merged_sentence
+
+        # "deep_case": "" がもうない場合ループを終了
+        if not has_empty_deep_case:
+            break
+
+    return sentence
 
 
 def merge_sahendoushi(record):

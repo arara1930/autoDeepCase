@@ -50,7 +50,7 @@ def katakana_to_rome(text):
 
 def add_deepCase(dict_data):
     def process_gakaku(data):
-        # 'case'が'ガ格'の要素をカウント
+        # 'surface_case'が'ガ格'の要素をカウント
         count_gakaku = sum(
             1 for item in data if item['surface_case'] == '<ga>')
         count_nikaku = sum(
@@ -241,7 +241,7 @@ def add_deepCase(dict_data):
             if item['surface_case'] == '<de>' and (match_place4 and match_animal_place):
                 item['deep_case'] = '<場所格>'
             elif item['surface_case'] == '<de>' and match_animal_place:
-                if not count_nikaku_animal_place != 0:
+                if count_nikaku_animal_place != 0:
                     item['deep_case'] = '<部位格>'
                 else:
                     item['deep_case'] = '<手段・道具格>'

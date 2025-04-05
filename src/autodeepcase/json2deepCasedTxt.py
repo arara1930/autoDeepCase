@@ -1,7 +1,9 @@
 import json
 
+# nliの形式に対応できるよう、sentence_1とsentence_2の両方に対して処理を行う
 
-def json2deepCasedTxt(deep_cased_dicts):
+
+def json2deepCasedTxt_for_nli(deep_cased_dicts):
     sentence_pair_dicts = []
     for item in deep_cased_dicts:
         sentence_1 = []
@@ -28,11 +30,24 @@ def json2deepCasedTxt(deep_cased_dicts):
     return sentence_pair_dicts
 
 
+def json2deepCasedTxt(deep_cased_dicts):
+    sentence = []
+    # sentenceに対する処理
+    for phrase_dict in deep_cased_dicts:
+        text = phrase_dict['text']
+        deep_case = phrase_dict['deep_case']
+        sentence.append(text)
+        sentence.append(deep_case)
+
+    string_sentence = ''.join(sentence)
+    return string_sentence
+
+
 def main():
     with open('../../data/deepCased_sentences.json', 'r', encoding='utf-8') as f:
         deep_cased_dicts = json.load(f)
 
-    sentence_pair_dicts = json2deepCasedTxt(deep_cased_dicts)
+    sentence_pair_dicts = json2deepCasedTxt_for_nli(deep_cased_dicts)
 
     # JSON形式の文字列に変換
     json_data = json.dumps(sentence_pair_dicts, ensure_ascii=False, indent=4)

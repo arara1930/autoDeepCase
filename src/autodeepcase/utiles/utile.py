@@ -19,8 +19,8 @@ def find_duplicates(lst):
 
 
 def parse_text_to_dict_lists(phrase_dict, jumanpp):
-    print("a_predicate_term", phrase_dict)
-    print('\n')
+    # print("a_predicate_term", phrase_dict)
+    # print('\n')
 
     # それぞれのキーを別々のリストに格納
     text = []
